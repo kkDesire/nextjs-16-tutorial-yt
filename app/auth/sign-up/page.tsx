@@ -18,6 +18,10 @@ export default function SignUpPage() {
         }
     })
 
+    function onSubmit() {
+        console.log("Yoooo")
+    }
+
     return (
         <Card>
             <CardHeader>
@@ -25,7 +29,7 @@ export default function SignUpPage() {
                 <CardDescription>Create an account to get started</CardDescription>
             </CardHeader>
             <CardContent>
-                <form>
+                <form onSubmit={form.handleSubmit(onSubmit)}>
                     <FieldGroup>
                         <Controller
                             name="name"
@@ -33,9 +37,13 @@ export default function SignUpPage() {
                             render={({ field, fieldState }) => (
                                 <Field>
                                     <FieldLabel>Full Name</FieldLabel>
-                                    <Input {...field} placeholder="John Doe" />
+                                    <Input
+                                        aria-invalid={fieldState.invalid}
+                                        {...field}
+                                        placeholder="John Doe"
+                                    />
                                     {fieldState.invalid && (
-                                        <FieldError errors={[fieldState.error]}/>
+                                        <FieldError errors={[fieldState.error]} />
                                     )}
                                 </Field>
                             )}
@@ -46,9 +54,13 @@ export default function SignUpPage() {
                             render={({ field, fieldState }) => (
                                 <Field>
                                     <FieldLabel>Email</FieldLabel>
-                                    <Input {...field} placeholder="john@doe.com" />
+                                    <Input
+                                        aria-invalid={fieldState.invalid}
+                                        {...field}
+                                        placeholder="john@doe.com"
+                                    />
                                     {fieldState.invalid && (
-                                        <FieldError errors={[fieldState.error]}/>
+                                        <FieldError errors={[fieldState.error]} />
                                     )}
                                 </Field>
                             )}
@@ -59,9 +71,14 @@ export default function SignUpPage() {
                             render={({ field, fieldState }) => (
                                 <Field>
                                     <FieldLabel>Password</FieldLabel>
-                                    <Input {...field} placeholder="********" type="password" />
+                                    <Input
+                                        aria-invalid={fieldState.invalid}
+                                        {...field}
+                                        placeholder="********"
+                                        type="password"
+                                    />
                                     {fieldState.invalid && (
-                                        <FieldError errors={[fieldState.error]}/>
+                                        <FieldError errors={[fieldState.error]} />
                                     )}
                                 </Field>
                             )}
