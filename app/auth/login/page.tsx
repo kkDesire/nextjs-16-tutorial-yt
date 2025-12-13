@@ -8,8 +8,15 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { useTransition } from "react";
+import { Loader2 } from "lucide-react";
 
 export default function LoginPage() {
+    const [isPending, startTransition] = useTransition()
+    const router = useRouter()
+
     const form = useForm({
         resolver: zodResolver(loginSchema),
         defaultValues: {
@@ -18,11 +25,23 @@ export default function LoginPage() {
         }
     })
 
-    async function onSubmit(data: ILogin) {
-        await authClient.signIn.email({
-            email: data.email,
-            password: data.password,
+    function onSubmit(data: ILogin) {
+        startTransition(async () => {
+            await authClient.signIn.email({
+                email: data.email,
+                password: data.password,
+                fetchOptions: {
+                    onSuccess: () => {
+                        toast.success("Logged in successfully")
+                        router.push("/")
+                    },
+                    onError: (error) => {
+                        toast.error(error.error.message)
+                    }
+                }
+            })
         })
+
     }
     return (
         <Card>
@@ -68,7 +87,21 @@ export default function LoginPage() {
                                 </Field>
                             )}
                         />
-                        <Button type="submit">Login</Button>
+                        <Button
+                            type="submit"
+                            disabled={isPending}
+                        >
+                            {
+                                isPending ? (
+                                    <>
+                                        <Loader2 className="size-4 animate-spin" />
+                                        <span>Loading...</span>
+                                    </>
+                                )
+                                    : <span>Login</span>
+                            }
+
+                        </Button>
                     </FieldGroup>
                 </form>
             </CardContent>
