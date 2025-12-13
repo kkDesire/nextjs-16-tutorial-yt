@@ -1,10 +1,11 @@
 "use client"
 
-import { signUpSchema } from "@/app/schemas/auth";
+import { ISignUp, signUpSchema } from "@/app/schemas/auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { authClient } from "@/lib/auth-client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 
@@ -18,8 +19,12 @@ export default function SignUpPage() {
         }
     })
 
-    function onSubmit() {
-        console.log("Yoooo")
+    async function onSubmit(data: ISignUp) {
+        await authClient.signUp.email({
+            email: data.email,
+            name: data.name,
+            password: data.password,
+        })
     }
 
     return (
