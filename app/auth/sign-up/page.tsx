@@ -7,9 +7,16 @@ import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field
 import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 export default function SignUpPage() {
+    const [isPending, startTransition] = useTransition()
+    const router = useRouter()
+
     const form = useForm({
         resolver: zodResolver(signUpSchema),
         defaultValues: {
@@ -19,11 +26,23 @@ export default function SignUpPage() {
         }
     })
 
-    async function onSubmit(data: ISignUp) {
-        await authClient.signUp.email({
-            email: data.email,
-            name: data.name,
-            password: data.password,
+    function onSubmit(data: ISignUp) {
+        startTransition(async () => {
+            await authClient.signUp.email({
+                email: data.email,
+                name: data.name,
+                password: data.password,
+                fetchOptions: {
+                    onSuccess: () => {
+                        toast.success("Account created successfully")
+                        router.push("/")
+                    },
+                    onError: (error) => {
+                        toast.error(error.error.message)
+                    }
+                }
+            })
+
         })
     }
 
@@ -88,7 +107,21 @@ export default function SignUpPage() {
                                 </Field>
                             )}
                         />
-                        <Button type="submit">Sign Up</Button>
+                        <Button
+                            type="submit"
+                            disabled={isPending}
+                        >
+                            {
+                                isPending ? (
+                                    <>
+                                        <Loader2 className="size-4 animate-spin" />
+                                        <span>Loading...</span>
+                                    </>
+                                )
+                                    : <span>Sign Up</span>
+                            }
+
+                        </Button>
                     </FieldGroup>
                 </form>
             </CardContent>
