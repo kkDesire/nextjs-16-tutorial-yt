@@ -8,19 +8,50 @@ import { redirect } from "next/navigation"
 import { getToken } from "@/lib/auth-server"
 
 export async function createBlogAction(values: z.infer<typeof postSchema>) {
-    const passed = postSchema.safeParse(values)
-    if (!passed.success) {
-        throw new Error("Something went wrong")
+    try {
+        const passed = postSchema.safeParse(values)
+        if (!passed.success) {
+            throw new Error("Something went wrong")
+        }
+
+        const token = await getToken()
+
+        const imageUrl = await fetchMutation(api.posts.generateImageUploadUrl, {}, {
+            token
+        })
+
+        const uploadResult = await fetch(imageUrl, {
+            method: "POST",
+            headers: {
+                "Content-Type": passed.data.image.type,
+            },
+            body: passed.data.image,
+        })
+
+        if (!uploadResult.ok) {
+            return {
+                error: "Failed to upload image"
+            }
+        }
+
+        const { storageId } = await uploadResult.json()
+        await fetchMutation(api.posts.createPost, {
+            title: passed.data.title,
+            body: passed.data.content,
+            imageStorageId: storageId,
+        }, {
+            token
+        })
+
+        return redirect("/")
+
+
+    } catch (error) {
+        return {
+            error: "Failed to create post"
+        }
     }
 
-    const token = await getToken()
 
-    await fetchMutation(api.posts.createPost, {
-        title: passed.data.title,
-        body: passed.data.content,
-    }, {
-        token
-    })
 
-    return redirect("/")
 }

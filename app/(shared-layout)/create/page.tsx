@@ -11,21 +11,16 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Loader2 } from 'lucide-react'
 import { Textarea } from '@/components/ui/textarea'
-import { useMutation } from 'convex/react'
-import { api } from '@/convex/_generated/api'
-import { toast } from 'sonner'
-import { useRouter } from 'next/navigation'
 import { createBlogAction } from '@/app/actions'
 
 export default function CreateRoute() {
     const [isPending, startTransition] = useTransition()
-    const router = useRouter()
-    const mutation = useMutation(api.posts.createPost)
     const form = useForm({
         resolver: zodResolver(postSchema),
         defaultValues: {
             title: '',
             content: '',
+            image: undefined,
         }
     })
 
@@ -77,6 +72,30 @@ export default function CreateRoute() {
                                             aria-invalid={fieldState.invalid}
                                             {...field}
                                             placeholder="Super cool blog content"
+                                        />
+                                        {fieldState.invalid && (
+                                            <FieldError errors={[fieldState.error]} />
+                                        )}
+                                    </Field>
+                                )}
+                            />
+                            <Controller
+                                name="image"
+                                control={form.control}
+                                render={({ field, fieldState }) => (
+                                    <Field>
+                                        <FieldLabel>Image</FieldLabel>
+                                        <Input
+                                            aria-invalid={fieldState.invalid}
+                                            placeholder="Super cool blog content"
+                                            type='file'
+                                            accept='image/*'
+                                            onChange={(e) => {
+                                                const file = e.target.files?.[0]
+                                                if (file) {
+                                                    field.onChange(file)
+                                                }
+                                            }}
                                         />
                                         {fieldState.invalid && (
                                             <FieldError errors={[fieldState.error]} />
