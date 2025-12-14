@@ -15,6 +15,7 @@ import { useMutation } from 'convex/react'
 import { api } from '@/convex/_generated/api'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
+import { createBlogAction } from '@/app/actions'
 
 export default function CreateRoute() {
     const [isPending, startTransition] = useTransition()
@@ -30,10 +31,12 @@ export default function CreateRoute() {
 
     function onSubmit(values: z.infer<typeof postSchema>) {
         startTransition(async () => {
-            mutation({
-                title: values.title,
-                body: values.content,
-            })
+            // mutation({
+            //     title: values.title,
+            //     body: values.content,
+            // })
+
+            await createBlogAction()
 
             toast.success("Post created successfully")
             router.push("/")
