@@ -7,6 +7,11 @@ const nextConfig: NextConfig = {
         hostname: "images.unsplash.com",
         protocol: "https",
         port: "",
+      },
+      {
+        hostname: "hallowed-raccoon-99.convex.cloud",
+        protocol: "https",
+        port: "",
       }
     ]
   }
