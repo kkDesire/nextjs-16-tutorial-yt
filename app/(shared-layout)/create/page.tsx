@@ -1,6 +1,6 @@
 "use client"
 
-import { blogSchema } from '@/app/schemas/blog'
+import { postSchema } from '@/app/schemas/blog'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useTransition } from 'react'
 import { Controller, useForm } from 'react-hook-form'
@@ -11,32 +11,32 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Loader2 } from 'lucide-react'
 import { Textarea } from '@/components/ui/textarea'
+import { useMutation } from 'convex/react'
+import { api } from '@/convex/_generated/api'
+import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
 
 export default function CreateRoute() {
     const [isPending, startTransition] = useTransition()
+    const router = useRouter()
+    const mutation = useMutation(api.posts.createPost)
     const form = useForm({
-        resolver: zodResolver(blogSchema),
+        resolver: zodResolver(postSchema),
         defaultValues: {
             title: '',
             content: '',
         }
     })
 
-    function onSubmit(data: z.infer<typeof blogSchema>) {
+    function onSubmit(values: z.infer<typeof postSchema>) {
         startTransition(async () => {
-            console.log(data)
-            // await blogClient.create({
-            //     data,
-            //     fetchOptions: {
-            //         onSuccess: () => {
-            //             toast.success("Blog created successfully")
-            //             router.push("/")
-            //         },
-            //         onError: (error) => {
-            //             toast.error(error.error.message)
-            //         }
-            //     }
-            // })
+            mutation({
+                title: values.title,
+                body: values.content,
+            })
+
+            toast.success("Post created successfully")
+            router.push("/")
         })
     }
 
@@ -100,7 +100,7 @@ export default function CreateRoute() {
                                             <span>Loading...</span>
                                         </>
                                     )
-                                        : <span>Create</span>
+                                        : <span>Create Post</span>
                                 }
 
                             </Button>
