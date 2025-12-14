@@ -27,10 +27,14 @@ export const getPosts = query({
 
     return await Promise.all(
       posts.map(async (post) => {
-        const resolveImageUrl = post.imageStorageId !== undefined ? await ctx.storage.getUrl(post.imageStorageId) : null;
+        const resolveImageUrl = post.imageStorageId !== undefined ? await 
+        ctx.storage.getUrl(post.imageStorageId) : null;
+        return {
+          ...post,
+          imageUrl: resolveImageUrl,
+        }
       })
     )
-    return posts;
   },
 });
 
